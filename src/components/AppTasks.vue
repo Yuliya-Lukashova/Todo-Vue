@@ -1,36 +1,83 @@
 <script lang="ts">
+import { defineComponent } from "vue";
+import AppTask from "./AppTask.vue";
 
+// interface Task {
+//   tasks: {
+//     id: number;
+//     num: number;
+//     taskText: string;
+//     completed: boolean;
+//   };
+// }
+
+// interface Test {
+//   taskText: string;
+// }
+
+export default defineComponent({
+  components: {
+    AppTask,
+  },
+  data() {
+    return {
+      tasks: [
+        {
+          id: 0,
+          num: 1,
+          taskText: "Lorem ipsum dolor sit amet consectetur adipisicing.",
+          completed: true,
+        },
+      ],
+      taskText: "",
+    };
+  },
+  methods: {
+    toggleTask(id: number) {
+      const targetTask = this.tasks.find((task) => task.id === id);
+      if (targetTask) {
+        targetTask.completed = !targetTask.completed;
+      }
+    },
+    removeTask(id: number) {
+      this.tasks = this.tasks.filter((task) => task.id !== id);
+    },
+    addTask() {
+      if (this.taskText) {
+        this.tasks.push({
+          id: Date.now(),
+          num: this.tasks.length + 1,
+          taskText: this.taskText,
+          completed: false,
+        });
+        this.taskText = "";
+      }
+    },
+  },
+});
 </script>
 
 <template>
-    <p class="todo__title">TODO APP</p>
-    <form 
-      class="input-wrapper"
-      >
-        <input 
-          class="todo-input"
-          placeholder="Enter task text..."
-          type="text">
-        <button class="add-button" type="submit">Add</button>
-      </form>
-      <p class="todo__title">List of tasks for today:</p>
-      <ul class="tasks">
-        <li class="task">
-          <span class="num">1</span>
-          <p class="task-text">Lorem ipsum dolor sit amet consectetur adipisicing.</p>
-          <button class="delete-task">X</button>
-        </li>
-        <li class="task">
-          <span class="num">2</span>
-          <p class="task-text">Lorem ipsum dolor sit amet consectetur adipisicing.</p>
-          <button class="delete-task">X</button>
-        </li>
-        <li class="task">
-          <span class="num">3</span>
-          <p class="task-text">Lorem ipsum dolor sit amet consectetur adipisicing.</p>
-          <button class="delete-task">X</button>
-        </li>
-      </ul>
+  <p class="todo__title">TODO APP</p>
+  <form class="input-wrapper" @submit.prevent>
+    <input
+      v-model="taskText"
+      class="todo-input"
+      placeholder="Enter task text..."
+      type="text"
+    />
+    <button class="add-button" type="submit" @click="addTask">Add</button>
+  </form>
+  <p class="todo__title">List of tasks for today:</p>
+  <ul class="tasks">
+    <AppTask
+      v-for="task in tasks"
+      :key="task.id"
+      :task="task"
+      @toggle-task="toggleTask"
+      @remove-task="removeTask"
+    />
+  </ul>
 </template>
 
 <style scoped>
@@ -51,12 +98,12 @@
   height: 17px;
 }
 .task {
- display: flex;
- justify-content: center;
- align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .task-text {
-  font-family: 'Mooli', sans-serif;
+  font-family: "Mooli", sans-serif;
   margin-top: 15px;
   width: 400px;
   padding: 10px 20px;
@@ -90,7 +137,7 @@
   padding: 10px 20px;
   border-radius: 20px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-  transition: .9s ease;
+  transition: 0.9s ease;
 }
 
 .add-button[type="submit"]:hover {
